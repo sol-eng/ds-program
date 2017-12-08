@@ -5,6 +5,7 @@ Production - Shiny app
 
 ## Project
 
+- Main purpose of this app is to receive user inputs and return results based on the currently fitted model
 - The code for this project should follow more stringent patterns of development-testing-production 
 - The app could be developed by programmers that are more specialized in enterprise dashboarding
 
