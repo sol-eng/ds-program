@@ -1,0 +1,59 @@
+---
+title: "Titanic - Fit model"
+author: "Edgar Ruiz"
+date: "December 7, 2017"
+output: html_document
+---
+
+```{r, include = FALSE}
+library(tfestimators)
+library(tidyverse)
+library(titanic)
+```
+
+```{r}
+df <- titanic_train
+
+tidy_df <- df %>%
+  rename_all(tolower) %>%
+  filter(!is.na(age)) %>%
+  mutate(is_five = ifelse(age <= 5, "yes", "no"),
+         pclass = case_when(
+           pclass == 1 ~ "first",
+           pclass == 2 ~ "second",
+           pclass == 3 ~ "third"
+         )) %>%
+  select(
+    is_five,
+    pclass,
+    sex,
+    survived
+  ) 
+
+glimpse(tidy_df)
+```
+
+
+```{r}
+model <- glm(survived ~ ., data = tidy_df)
+
+summary(model)
+```
+
+
+```{r}
+
+saveRDS(model, "production - live score/model.rds")
+saveRDS(model, "production - batch score/model.rds")
+saveRDS(model, "production - app/model.rds")
+
+
+```
+
+
+
+
+
+
+
+

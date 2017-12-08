@@ -1,0 +1,154 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r, include = FALSE}
+library(tidyverse)
+library(titanic)
+```
+
+## Import
+
+This step could be reading a file, or loading an R package dataset into a variable.
+
+```{r}
+df <- titanic_train
+
+df
+```
+
+## Tidy & transform
+
+```{r}
+tidy_df <- df %>%
+  filter(!is.na(Age)) %>%
+  mutate(is_female = ifelse(Sex == "female", 0, 1)) %>%
+  select(
+    -Ticket,
+    -Cabin,
+    -Sex,
+    -PassengerId,
+    -Name
+  ) %>%
+  rename_all(tolower)
+
+glimpse(tidy_df)
+```
+
+## Visualization
+
+```{r}
+library(ggplot2)
+
+ggplot(data = tidy_df) +
+  geom_histogram(aes(x = age), binwidth =  5)
+
+```
+
+
+```{r}
+tidy_df %>%
+  mutate(age_bin = cut(age, breaks = c(0, 5, 10, 20, 30, 40, 60, 80))) %>%
+  group_by(age_bin) %>%
+  summarise(survived = sum(survived) / n()) %>%
+  ggplot() +
+  geom_col(aes(x = age_bin, y = survived))
+
+```
+
+## Model
+
+```{r}
+tidy_df %>%
+  select(-embarked) %>%
+  cor(.) 
+```
+
+
+
+```{r}
+set.seed(100)
+
+model_df <- tidy_df %>%
+  select(
+    -fare
+  ) %>%
+  sample_frac(0.8)
+
+model1 <- glm(survived ~. , data = model_df)
+
+summary(model1)
+```
+
+```{r}
+indices <- sample(1:nrow(tidy_df), size = 0.80 * nrow(tidy_df))
+train <- tidy_df[indices, ]
+test  <- tidy_df[-indices, ]
+
+model_df <- train %>%
+  select(
+    -fare,
+    -parch,
+    -sibsp,
+    -embarked
+  ) %>%
+  mutate(age = ifelse(age <= 5, 1, 0))
+
+model2 <- glm(survived ~. , data = model_df)
+
+summary(model2)
+```
+
+```{r}
+validation <- predict(model2, test)
+
+val_df <- test %>%
+  mutate(score = validation,
+         prediction = ifelse(score < 0.7, 0, 1)) 
+
+
+results <- val_df %>%
+  group_by(
+    survived,
+    prediction
+  ) %>%
+  tally()
+
+results
+```
+
+
+
+## Appendix
+
+Data Dictionary (source: Kaggle.com)
+
+  Variable	Definition	Key
+  survival	Survival	0 = No, 1 = Yes
+  pclass	Ticket class	1 = 1st, 2 = 2nd, 3 = 3rd
+  sex	Sex	
+  Age	Age in years	
+  sibsp	# of siblings / spouses aboard the Titanic	
+  parch	# of parents / children aboard the Titanic	
+  ticket	Ticket number	
+  fare	Passenger fare	
+  cabin	Cabin number	
+  embarked	Port of Embarkation	C = Cherbourg, Q = Queenstown, S = Southampton
+  Variable Notes
+  
+  pclass: A proxy for socio-economic status (SES)
+  1st = Upper
+  2nd = Middle
+  3rd = Lower
+  
+  age: Age is fractional if less than 1. If the age is estimated, is it in the form of xx.5
+  
+  sibsp: The dataset defines family relations in this way...
+  Sibling = brother, sister, stepbrother, stepsister
+  Spouse = husband, wife (mistresses and fiancés were ignored)
+  
+  parch: The dataset defines family relations in this way...
+  Parent = mother, father
+  Child = daughter, son, stepdaughter, stepson
+  Some children travelled only with a nanny, therefore parch=0 for them.

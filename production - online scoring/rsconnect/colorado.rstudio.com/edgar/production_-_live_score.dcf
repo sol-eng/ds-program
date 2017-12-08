@@ -1,0 +1,10 @@
+name: production_-_live_score
+title:
+username: edgar
+account: edgar
+server: colorado.rstudio.com
+hostUrl: http://colorado.rstudio.com:3939/__api__
+appId: 810
+bundleId: 1701
+url: http://colorado.rstudio.com:3939/content/810/
+when: 1512705040.8034

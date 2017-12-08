@@ -1,0 +1,131 @@
+---
+title: "Titanic Survival"
+author: "Edgar Ruiz"
+date: "December 7, 2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(titanic)
+library(ggplot2)
+library(DT)
+
+df <- titanic_train
+
+tidy_df <- df %>%
+  filter(!is.na(Age)) %>%
+  mutate(is_female = ifelse(Sex == "female", 0, 1)) %>%
+  select(
+    -Ticket,
+    -Cabin,
+    -PassengerId,
+    -Name
+  ) %>%
+  rename_all(tolower)
+
+
+```
+
+## Survival by Gender
+
+In the dataset, 20% of Males survived, versus 75% of Women
+
+```{r}
+tidy_df %>%
+  group_by(sex) %>%
+  summarise(survived = sum(survived) / n()) %>%
+  ggplot() +
+  geom_col(aes(x = sex, y = survived, fill = sex)) +
+  labs(title = "", 
+       x = "", 
+       y = "Survived %") +
+  scale_y_continuous(breaks = c(0, 0.2, 0.75), labels = c("0%", "20%", "75%")) +
+  theme(legend.position = "none")
+  
+```
+
+## Survival by Cabin Class
+
+First and Second class had at least double chances of survival
+
+```{r}
+tidy_df %>%
+  group_by(pclass) %>%
+  summarise(survived = sum(survived) / n()) %>%
+  ggplot() +
+  geom_col(aes(x = pclass, y = survived, fill = factor(pclass))) +
+  labs(title = "", 
+       x = "", 
+       y = "Survived %") +
+  scale_y_continuous(breaks = c(0.25,0.5, 0.65), labels = c("25%", "50%", "65%")) +
+  scale_x_continuous(breaks = c(1,2,3), labels = c("First", "Second", "Third")) +
+  theme(legend.position = "none")
+  
+```
+
+## Survival by Age
+
+Young children had 30% higher survival rate 
+
+```{r}
+tidy_df %>%
+  mutate(age_bin = cut(age, breaks = c(0, 5,  40,  80))) %>%
+  group_by(age_bin) %>%
+  summarise(survived = sum(survived) / n()) %>%
+  ggplot() +
+  geom_col(aes(x = age_bin, y = survived, fill = factor(age_bin))) +
+  labs(title = "",
+       x = "",
+       y = "Survived %") +
+  scale_y_continuous(breaks = c(0.4, 0.7), labels = c( "40%", "70%")) +
+  theme(legend.position = "none")
+  
+  
+```
+
+## Model 
+
+```{r}
+set.seed(100)
+
+indices <- sample(1:nrow(tidy_df), size = 0.80 * nrow(tidy_df))
+train <- tidy_df[indices, ]
+test  <- tidy_df[-indices, ]
+
+model_df <- train %>%
+  select(
+    age,
+    pclass,
+    is_female,
+    survived
+  ) %>%
+  mutate(age = ifelse(age <= 5, 1, 0))
+
+model <- glm(survived ~. , data = model_df)
+
+summary(model)
+```
+
+## Model validation
+
+Validation returns only 3 False Negatives
+
+```{r}
+validation <- predict(model, test)
+
+val_df <- test %>%
+  mutate(score = validation,
+         prediction = ifelse(score <= 0.5, 0, 1)) 
+
+
+results <- val_df %>%
+  group_by(
+    survived,
+    prediction
+  ) %>%
+  tally()
+
+results
+```

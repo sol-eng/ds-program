@@ -1,0 +1,78 @@
+---
+title: "Titanic - Batch Scoring"
+author: "Edgar Ruiz"
+date: "December 7, 2017"
+output: html_document
+---
+
+```{r, include = FALSE}
+library(DBI)
+library(RSQLite)
+library(titanic)
+library(dplyr)
+```
+
+```{r}
+library(DBI)
+library(RSQLite)
+library(titanic)
+library(dplyr)
+
+con <- dbConnect(SQLite(), dbname = "/tmp_shared/titanic.sqlite")
+```
+
+```{r}
+dbWriteTable(con, "titanic", titanic_test, overwrite = TRUE)
+
+```
+
+```{r}
+model <- readRDS("model.rds")
+
+  
+tidy_df <- tbl(con, "titanic") %>%
+  filter(!is.na(Age)) %>%
+  mutate(is_five = ifelse(Age <= 5, "yes", "no"),
+         class = case_when(
+           Pclass == 1 ~ "first",
+           Pclass == 2 ~ "second",
+           Pclass == 3 ~ "third"
+         )) %>%
+  select(
+    PassengerId,
+    is_five,
+    pclass = class,
+    Sex
+  )  %>%
+  rename(sex = Sex) %>%
+  collect()
+
+head(tidy_df)
+```
+
+```{r}
+pred <- predict(model, tidy_df, se.fit = TRUE)
+
+interval <- 1.96 * pred$se.fit
+
+
+upr <- pred$fit + interval
+lwr <- pred$fit - interval
+fit <- pred$fit
+
+prediction <- data.frame(
+  PassengerId = tidy_df$PassengerId,
+  upper = upr,
+  lower = lwr,
+  fit = fit) %>%
+  mutate(survived = ifelse(fit >= 0.5, "Yes", "No"))
+
+head(prediction)
+
+dbWriteTable(con, "scoring", prediction, overwrite = TRUE)
+
+```
+
+```{r}
+dbDisconnect(con)
+```
