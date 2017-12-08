@@ -1,7 +1,7 @@
 Production - Fit Model
 ===============================
 
-<img arc="/Zzz-images/model.PNG" style="display: block; margin: auto;" />
+<img src="/Zzz-images/model.PNG" style="display: block; margin: auto;" />
 
 ## Project
 
