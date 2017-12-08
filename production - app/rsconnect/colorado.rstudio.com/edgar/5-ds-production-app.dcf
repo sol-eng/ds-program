@@ -1,0 +1,13 @@
+name: 5-ds-production-app
+title: 5-ds-production-app
+username: edgar
+account: edgar
+server: colorado.rstudio.com
+hostUrl: http://colorado.rstudio.com:3939/__api__
+appId: 818
+bundleId: 1710
+url: http://colorado.rstudio.com:3939/content/818/
+when: 1512771426.34912
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: README.md
