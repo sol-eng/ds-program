@@ -1,0 +1,12 @@
+name: 3-ds-communicate-deck
+title: 3-ds-communicate-deck
+username: edgar
+account: edgar
+server: colorado.rstudio.com
+hostUrl: http://colorado.rstudio.com:3939/__api__
+appId: 815
+bundleId: 1707
+url: http://colorado.rstudio.com:3939/content/815/
+when: 1512764368.53124
+asMultiple: FALSE
+asStatic: TRUE

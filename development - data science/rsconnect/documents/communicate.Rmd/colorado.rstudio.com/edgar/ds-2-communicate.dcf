@@ -1,0 +1,12 @@
+name: ds-2-communicate
+title: ds-2-communicate
+username: edgar
+account: edgar
+server: colorado.rstudio.com
+hostUrl: http://colorado.rstudio.com:3939/__api__
+appId: 814
+bundleId: 1706
+url: http://colorado.rstudio.com:3939/content/814/
+when: 1512764189.3894
+asMultiple: FALSE
+asStatic: FALSE
