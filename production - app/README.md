@@ -1,6 +1,8 @@
 Production - Shiny app
 ===============================
 
+<img src="/zzz-images/shiny-app.PNG" style="display: block; margin: auto;" />
+
 ## Project
 
 - The code for this project should follow more stringent patterns of development-testing-production 
