@@ -1,0 +1,12 @@
+name: 4-ds-production-fit
+title: 4-ds-production-fit
+username: edgar
+account: edgar
+server: colorado.rstudio.com
+hostUrl: http://colorado.rstudio.com:3939/__api__
+appId: 816
+bundleId: 1708
+url: http://colorado.rstudio.com:3939/content/816/
+when: 1512767944.07293
+asMultiple: FALSE
+asStatic: FALSE

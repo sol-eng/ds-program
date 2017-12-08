@@ -43,10 +43,9 @@ summary(model)
 
 ```{r}
 
-saveRDS(model, "production - live score/model.rds")
+saveRDS(model, "production - online scoring/model.rds")
 saveRDS(model, "production - batch score/model.rds")
 saveRDS(model, "production - app/model.rds")
-
 
 ```
 

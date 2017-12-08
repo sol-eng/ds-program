@@ -12,4 +12,8 @@ Production - Fit Model
 - The updated model is made available to downstream applications that score the data
 
 
+## Execution
 
+The *production-fit.Rmd* script has an example of the code that will read the new data and save the newly fitted model to the respective folders.  
+
+In Rstudio Connect, the updates can be automated by scheduling the execution of an R Markdown document that contains the model fitting: http://colorado.rstudio.com:3939/content/817/production-fit.html
